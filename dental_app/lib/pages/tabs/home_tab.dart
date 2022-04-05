@@ -5,7 +5,7 @@ import 'package:dental_app/resources/dimens.dart';
 import 'package:dental_app/resources/constants.dart';
 import 'package:dental_app/view_items.dart/range_time_view.dart';
 import 'package:dental_app/widgets/PatientListView.dart';
-import 'package:dental_app/widgets/time_and_event_list_view.dart';
+import 'package:dental_app/widgets/Modified_time_and_event_list_view.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
@@ -22,7 +22,7 @@ class _CalendarTabState extends State<CalendarTab> {
 
 List<String> dropDownList = ["Monday","Tueday","Wedesday","Thursday","Friday","Saturday","Sunday"];
 
-List<String> timeList = ["8:00","8:30","9:00","9:30","10:00","10:30","11:00",];
+List<String> timeList = ["8:00","8:30","9:00","9:30","10:00","10:30","11:00","11:30","12:00","12:30","1:00","1:30","2:00","2:30","3:00"];
 
 List<Widget> timeAndEventCardInfoList = [
 
@@ -67,7 +67,8 @@ List<Widget> timeAndEventCardInfoList = [
       Navigator.of(context).push(
         MaterialPageRoute(builder: (BuildContext context) => DetailPage()),
       ),
-      ),
+       ),
+
          TimeAndEventItemView(
     title: "Cydra Clone",
      iconData: Icon(Icons.enhanced_encryption),
@@ -77,6 +78,7 @@ List<Widget> timeAndEventCardInfoList = [
         MaterialPageRoute(builder: (BuildContext context) => DetailPage()),
       ),
       ),
+
          TimeAndEventItemView(
     title: "Formula Smith",
      iconData: Icon(Icons.enhanced_encryption),
@@ -99,12 +101,24 @@ List<Widget> timeAndEventCardInfoList = [
             child: Column(
               children: [
                 PatientInfoView(dropDownList: dropDownList),
-                SizedBox(height: 80,),
+                SizedBox(height: MARGIN_LARGE_OVER_2,),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_BETWEEN_SIZE),
+                  child: Row(
+                    children: [
+                      Text("Time"),
+                      SizedBox(width: MARGIN_LARGE_OVER,),
+                      Text("Event"),
+                    ],
+                  ),
+                ),
+                SizedBox(height: MARGIN_TINY_SMALL,),
                 Container(
-                  height: MediaQuery.of(context).size.height / 2,
+                  //height: MediaQuery.of(context).size.height / 2,
+                  height: TIME_AND_EVENT_SECTION_CONTAINER_HEIGHT,
                   width: MediaQuery.of(context).size.width,
                   child: Padding(
-                    padding: const EdgeInsets.only(left: MARGIN_MEDIUM_BETWEEN_SIZE),
+                    padding: EdgeInsets.only(left: MARGIN_MEDIUM_BETWEEN_SIZE),
                     child: ShowTimeSection(timeList: timeList, timeAndEventCardInfoList: timeAndEventCardInfoList),
             
                   ),
@@ -159,76 +173,39 @@ class ShowTimeSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-      Positioned(
-        child: Container(
-          color: TIME_AND_EVENT_UNDER_BACKGROUND_COLOR,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TimeSectionView(timeList: timeList),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        DottedLineView(),
-                        SizedBox(width: MARGIN_MEDIUM,),
-                        Text("Event",
-                        style: TextStyle(
-                       fontWeight: FontWeight.w600,
-                      ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    flex: 4,
-                    child: Container(
-                      width: 300,
-                      //height: 206,
-                      color: HOME_PAGE_BACKGROUND_TIME_LIST_COLOR,
-                    ),
-                  )
-                ],
-              ),
-              
-            ],
-          ),
-        ),
-      ),
+    return ModifiedTimeAndEventListView(
+        itemCount: 1,
+        itemBuilder: (BuildContext context,int index){
+        return ModifiedListView(
+          timeList: timeList, 
+          timeAndEventCardInfoList: timeAndEventCardInfoList,
+          );
+      },
+      refresh: () =>
+       SnackBarNotiView(context),
+        endList: () =>
+        SnackBarNotiView(context),
+      );
+  }
 
-      Positioned(
-        left: 80,
-        child: TimeAndEventListView(
-          itemBuilder: (BuildContext context,int index){
-               return timeAndEventCardInfoList[index];
-              },
-             itemCount: timeAndEventCardInfoList.length,
-             refresh: () => 
-             Scaffold.of(context).showSnackBar(
-               SnackBar(
-                 duration: Duration(seconds: 3),
-                 content: Text("time and event doing refresh"),
-                backgroundColor: PRIMARY_COLOR,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(MARGIN_SMALL_3),
-                    topRight: Radius.circular(MARGIN_SMALL_3),
-                  )
-                ),
+  ScaffoldFeatureController<SnackBar, SnackBarClosedReason> SnackBarNotiView(BuildContext context) {
+    return Scaffold.of(context).showSnackBar(
+              SnackBar(
+                duration: Duration(seconds: 3),
+               content: Text("time and event doing refresh"),
+               backgroundColor: PRIMARY_COLOR,
+               shape: RoundedRectangleBorder(
+                 borderRadius: BorderRadius.only(
+                   topLeft: Radius.circular(MARGIN_SMALL_3),
+                   topRight: Radius.circular(MARGIN_SMALL_3),
+                 )
                ),
-             ),
-        ),
-      ),
-      ],
-    );
+              ),
+          );
   }
 }
+
+
 
 class TimeAndEventItemView extends StatelessWidget {
 
@@ -250,9 +227,9 @@ class TimeAndEventItemView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        width: 80,
-        height: 80,
-        margin: EdgeInsets.all(MARGIN_SMALL_3),
+        width: EVENT_CARD_CONTAINER_WIDTH,
+        height: EVENT_CARD_CONTAINER_HEIGHT,
+        margin: EdgeInsets.all( MARGIN_SMALL_3),
         decoration: BoxDecoration(
           color: (isBeforeTime) ? Colors.grey.withOpacity(0.2) : Colors.white,
           borderRadius: BorderRadius.circular(MARGIN_SMALL_3),
@@ -287,6 +264,34 @@ class TimeAndEventItemView extends StatelessWidget {
   }
 }
 
+class ModifiedListView extends StatelessWidget {
+  const ModifiedListView({
+    Key? key,
+    required this.timeList,
+    required this.timeAndEventCardInfoList,
+  }) : super(key: key);
+
+  final List<String> timeList;
+  final List<Widget> timeAndEventCardInfoList;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+      TimeSectionView(timeList: timeList),
+      DottedLineView(),
+      TimeAndEventListView(
+      itemBuilder: (BuildContext context,int index){
+            return timeAndEventCardInfoList[index];
+           },
+          itemCount: timeAndEventCardInfoList.length,
+     ),
+    ],
+    );
+  }
+}
+
 
 
 class TimeSectionView extends StatelessWidget {
@@ -303,11 +308,8 @@ class TimeSectionView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Text("Time",
-        style: TextStyle(
-          fontWeight: FontWeight.w600,
-        ),),
           Container(
+           margin: EdgeInsets.only(top: MARGIN_MEDIUM),
             width: TIME_LIST_WIDTH,
             child: ListView.separated(
               separatorBuilder: (context,index) => SizedBox(height: MARGIN_MEDIUM_4,),
@@ -329,16 +331,52 @@ class TimeSectionView extends StatelessWidget {
   }
 }
 
+class TimeAndEventListView extends StatelessWidget {
+
+  final IndexedWidgetBuilder itemBuilder;
+  final int itemCount;
+
+  const TimeAndEventListView({
+    Key? key,
+    required this.itemBuilder,
+    required this.itemCount,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 286,
+      child: itemCount ==0 ?
+      Center(
+        child: Text("Sorry,This is not available now",
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+          color: PRIMARY_COLOR,
+        ),
+        ),
+      )
+      : ListView.builder(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        itemCount: itemCount,
+        itemBuilder: itemBuilder,
+      ),
+    );
+  }
+}
+
+
 class DottedLineView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        SizedBox(height: MARGIN_SMALL_3,),
        DottedLine(
        direction: Axis.vertical,
-       lineLength: 140,
+       lineLength: 100,
        dashColor: TIME_NUMBER_COLOR,
        lineThickness: 2.6,
        dashGapLength: 6.0,
